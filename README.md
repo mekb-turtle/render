@@ -10,3 +10,4 @@ Colour is converted from hex but used as floats. If alpha is omitted, it will de
 
 Examples:
 - [Cube](cube.tri)
+- [Nintendo 64](n64.tri)
