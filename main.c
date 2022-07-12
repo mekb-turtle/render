@@ -9,15 +9,25 @@
 #include <string.h>
 #include <errno.h>
 #define BLOCK 1024
+#define ROTATE_X_DEG 15
+#define ROTATE_Y_DEG 15
+#define ZOOM_MAX_DEG 5.0f
+#define ZOOM_MIN_DEG 0.005f
+#define ZOOM_DEG 1.2f
+#define MOVE 0.1f
+#define MOVE_MAX 1.0f
 struct Triangle {
 	float x1, y1, z1, x2, y2, z2, x3, y3, z3;
 	float r, g, b, a;
 };
 size_t triangle_len = 0;
 struct Triangle *triangles = NULL;
+bool lighting = 1;
 float zoom = 0.1f;
 float rotateX = 0.0f;
 float rotateY = 0.0f;
+float moveX = 0.0f;
+float moveY = 0.0f;
 void display() {
 	int w = glutGet(GLUT_WINDOW_WIDTH),
 	    h = glutGet(GLUT_WINDOW_HEIGHT),
@@ -30,8 +40,9 @@ void display() {
 	glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 	glEnable(GL_DEPTH_TEST);
 	glPushMatrix();
+	glTranslatef(moveX, moveY, 0);
 	glScalef(zoom, zoom, zoom);
-	printf("\x1b[2K%f %f %f\r\n\x1b[A", rotateX, rotateY, zoom);
+	printf("\x1b[2KmX %f, mY %f, rX %f, rY %f, z %f\r\n\x1b[A", moveX, moveY, rotateX, rotateY, zoom);
 	glRotatef(rotateY, 1.0f, 0.0f, 0.0f);
 	glRotatef(rotateX, 0.0f, 1.0f, 0.0f);
 	for (size_t i = 0; i <= triangle_len; ++i) {
@@ -47,47 +58,58 @@ void display() {
 }
 void special(int key, int x, int y) {
 	switch (key) {
-		case GLUT_KEY_LEFT:  rotateX += 15; break;
-		case GLUT_KEY_UP:    rotateY += 15; break;
-		case GLUT_KEY_RIGHT: rotateX -= 15; break;
-		case GLUT_KEY_DOWN:  rotateY -= 15; break;
+		case GLUT_KEY_LEFT:  rotateX += ROTATE_X_DEG; break;
+		case GLUT_KEY_UP:    rotateY += ROTATE_Y_DEG; break;
+		case GLUT_KEY_RIGHT: rotateX -= ROTATE_X_DEG; break;
+		case GLUT_KEY_DOWN:  rotateY -= ROTATE_Y_DEG; break;
 		default: return;
 	}
 	while (rotateX >= 360) rotateX -= 360;
-	while (rotateY >= 360) rotateY -= 360;
 	while (rotateX <  0)   rotateX += 360;
-	while (rotateY <  0)   rotateY += 360;
+	while (rotateY >= 180) rotateY -= 360;
+	while (rotateY < -180) rotateY += 360;
 	glutPostRedisplay();
+}
+void updateLighting(bool l) {
+	glEnable (GL_COLOR_MATERIAL);
+	if (l) {
+		glEnable (GL_LIGHTING);
+	} else {
+		glDisable(GL_LIGHTING);
+	}
 }
 void keyboard(unsigned char key, int x, int y) {
 	switch (key) {
-		case 'i':
-		case 'I':
-			if (zoom < 5)
-				zoom *= 1.2;
-			break;
-		case 'o':
-		case 'O':
-			if (zoom > 0.01)
-				zoom /= 1.2;
-			break;
-		case 'q':
-		case 'Q':
+		case 'i': case 'I': if (zoom < ZOOM_MAX_DEG) { zoom *= ZOOM_DEG; } break;
+		case 'o': case 'O': if (zoom > ZOOM_MIN_DEG) { zoom /= ZOOM_DEG; } break;
+		case 'A': case 'a': moveX -= MOVE; break;
+		case 'D': case 'd': moveX += MOVE; break;
+		case 'W': case 'w': moveY += MOVE; break;
+		case 'S': case 's': moveY -= MOVE; break;
+		case 'Q': case 'q':
 			exit(0);
 			printf("\x1b[2K");
 			return;
+		case 'R': case 'r': break;
+		case 'L': case 'l': updateLighting(lighting = !lighting); break;
 		default: return;
 	}
+	if (moveX > +MOVE_MAX) moveX = +MOVE_MAX;
+	if (moveX < -MOVE_MAX) moveX = -MOVE_MAX;
+	if (moveY > +MOVE_MAX) moveY = +MOVE_MAX;
+	if (moveY < -MOVE_MAX) moveY = -MOVE_MAX;
 	glutPostRedisplay();
 }
 int usage(char *argv0) {
 	fprintf(stderr, "\
 Usage: %s <file>\n\n\
 Controls:\n\
- Arrow keys to rotate camera\n\
- W,A,S,D to pan camera\n\
+ Arrow keys to rotate\n\
+ W,A,S,D to move\n\
  I,O to zoom in/out\n\
  Q to quit\n\
+ R to re-render\n\
+ L to toggle lighting\n\
 ", argv0);
 	return 2;
 }
@@ -152,6 +174,7 @@ int main(int argc, char* argv[]) {
 	char *title = malloc(strlen(file_name) + 16);
 	sprintf(title, "%s%s", "Render: ", file_name);
 	glutCreateWindow(title);
+	updateLighting(lighting);
 	glutDisplayFunc(display);
 	glutSpecialFunc(special);
 	glutKeyboardFunc(keyboard);
