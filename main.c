@@ -40,11 +40,12 @@ void display() {
 	glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 	glEnable(GL_DEPTH_TEST);
 	glPushMatrix();
+	printf("\x1b[2KmX %f, mY %f, rX %f, rY %f, z %f\r\n\x1b[A", moveX, moveY, rotateX, rotateY, zoom);
 	glTranslatef(moveX, moveY, 0);
 	glScalef(zoom, zoom, zoom);
-	printf("\x1b[2KmX %f, mY %f, rX %f, rY %f, z %f\r\n\x1b[A", moveX, moveY, rotateX, rotateY, zoom);
 	glRotatef(rotateY, 1.0f, 0.0f, 0.0f);
 	glRotatef(rotateX, 0.0f, 1.0f, 0.0f);
+	glLightfv(GL_LIGHT0, GL_POSITION, (float[]){0.0f,0.0f,0.0f,1.0f});
 	for (size_t i = 0; i <= triangle_len; ++i) {
 		glColor4f(triangles[i].r, triangles[i].g, triangles[i].b, triangles[i].a);
 		glBegin(GL_POLYGON);
@@ -58,10 +59,10 @@ void display() {
 }
 void special(int key, int x, int y) {
 	switch (key) {
-		case GLUT_KEY_LEFT:  rotateX += ROTATE_X_DEG; break;
-		case GLUT_KEY_UP:    rotateY += ROTATE_Y_DEG; break;
-		case GLUT_KEY_RIGHT: rotateX -= ROTATE_X_DEG; break;
-		case GLUT_KEY_DOWN:  rotateY -= ROTATE_Y_DEG; break;
+		case GLUT_KEY_LEFT:  rotateX -= ROTATE_X_DEG; break;
+		case GLUT_KEY_UP:    rotateY -= ROTATE_Y_DEG; break;
+		case GLUT_KEY_RIGHT: rotateX += ROTATE_X_DEG; break;
+		case GLUT_KEY_DOWN:  rotateY += ROTATE_Y_DEG; break;
 		default: return;
 	}
 	while (rotateX >= 360) rotateX -= 360;
@@ -71,7 +72,12 @@ void special(int key, int x, int y) {
 	glutPostRedisplay();
 }
 void updateLighting(bool l) {
-	glEnable (GL_COLOR_MATERIAL);
+	glEnable(GL_COLOR_MATERIAL);
+	glEnable(GL_LIGHT0);
+	glLightfv(GL_LIGHT0, GL_AMBIENT,  (float[]){0.0f,0.0f,0.0f,1.0f});
+	glLightfv(GL_LIGHT0, GL_DIFFUSE,  (float[]){1.0f,1.0f,1.0f,1.0f});
+	glLightfv(GL_LIGHT0, GL_SPECULAR, (float[]){1.0f,1.0f,1.0f,1.0f});
+	glColorMaterial(GL_FRONT_AND_BACK, GL_AMBIENT_AND_DIFFUSE);
 	if (l) {
 		glEnable (GL_LIGHTING);
 	} else {
