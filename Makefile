@@ -1,6 +1,6 @@
 CC=cc
 CFLAGS=-Wall -O2
-LFLAGS=-lm -lGL -lGLU -lglut
+LFLAGS=-lm -s -lGL -lGLU -lglut
 
 OBJS=main.o
 
