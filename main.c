@@ -226,8 +226,6 @@ int main(int argc, char* argv[]) {
 	printf("\n");
 	glutInit(&argc, argv);
 	glutInitDisplayMode(GLUT_SINGLE | GLUT_RGB | GLUT_DEPTH);
-	glutInitWindowSize(192, 108);
-	glutInitWindowPosition(0, 0);
 	char *title = malloc(strlen(file_name) + 16);
 	sprintf(title, "%s%s", "Render: ", file_name);
 	glutCreateWindow(title);
