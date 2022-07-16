@@ -56,7 +56,7 @@ void display() {
 		glEnd();
 	}
 	glPopMatrix();
-	glFlush();
+	glutSwapBuffers();
 }
 void updateLighting(bool l) {
 	glEnable(GL_COLOR_MATERIAL);
