@@ -160,8 +160,8 @@ int usage(char *argv0) {
 	fprintf(stderr, "\
 Usage: %s <file>\n\n\
 Controls:\n\
- Arrow keys or move left click to rotate\n\
- W,A,S,D or move right click to move\n\
+ Arrow keys or drag left click to rotate\n\
+ W,A,S,D or drag right click to move\n\
  I,O or scroll wheel to zoom in/out\n\
  Q to quit\n\
  R to re-render\n\

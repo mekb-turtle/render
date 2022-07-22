@@ -8,8 +8,8 @@ Coordinates are floats.
 Colour is converted from hex to floats. If alpha is omitted, it will default to 0xFF.
 
 Controls:
-- Arrow keys or move left click to rotate
-- <kbd>W</kbd>, <kbd>A</kbd>, <kbd>S</kbd>, <kbd>D</kbd> or move right click to move
+- Arrow keys or drag left click to rotate
+- <kbd>W</kbd>, <kbd>A</kbd>, <kbd>S</kbd>, <kbd>D</kbd> or drag right click to move
 - <kbd>I</kbd>, <kbd>O</kbd> or scroll wheel to zoom in/out
 - <kbd>Q</kbd> to quit
 - <kbd>R</kbd> to re-render
