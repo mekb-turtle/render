@@ -157,7 +157,7 @@ void motion(int x, int y) {
 	ix = x; iy = y;
 }
 int usage(char *argv0) {
-	fprintf(stderr, "\
+	eprintf("\
 Usage: %s <file>\n\n\
 Controls:\n\
  Arrow keys or drag left click to rotate\n\
@@ -191,18 +191,18 @@ int main(int argc, char* argv[]) {
 		file = fopen(file_name, "r");
 	}
 	if (!file) {
-		fprintf(stderr, "%s: %s\n", file_name, strerror(errno));
+		eprintf("%s: %s\n", file_name, strerror(errno));
 		return errno;
 	}
 	size_t size = 0;
 	while (1) {
 		struct Triangle tri;
 		unsigned long col;
-		if (ferror(file)) { fprintf(stderr, "Error reading\n"); return 4; }
+		if (ferror(file)) { eprintf("Error reading\n"); return 4; }
 		if (feof(file)) break;
 		if (fscanf(file, "%e %e %e  %e %e %e  %e %e %e  %lx\n",
 			&tri.x1, &tri.y1, &tri.z1, &tri.x2, &tri.y2, &tri.z2, &tri.x3, &tri.y3, &tri.z3, &col)
-			!= 10) { fprintf(stderr, "Invalid line %li\n", triangle_len+1); return 3; }
+			!= 10) { eprintf("Invalid line %li\n", triangle_len+1); return 3; }
 		col &= 0xffffffff;
 		if (col <= 0xffffff) {
 			col <<= 8;
@@ -218,7 +218,7 @@ int main(int argc, char* argv[]) {
 		}
 		triangles[triangle_len] = tri;
 		if (triangle_len > 0xffffff) {
-			fprintf(stderr, "Limit was hit, triangles after this will not be used\n");
+			eprintf("Limit was hit, triangles after this will not be used\n");
 			break;
 		}
 		++triangle_len;
